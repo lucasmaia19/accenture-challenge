@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="7.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LucasChallenge.Aplication\LucasChallenge.Aplication.csproj" />
+    <ProjectReference Include="..\LucasChallenge.Domain.Core\LucasChallenge.Domain.Core.csproj" />
+    <ProjectReference Include="..\LucasChallenge.Domain.Services\LucasChallenge.Domain.Services.csproj" />
+    <ProjectReference Include="..\LucasChallenge.Domain\LucasChallenge.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
