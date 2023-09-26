@@ -19,4 +19,5 @@ O back-end foi desenvolvido em .NET 6 Core, aplicando conceitos, framework e des
 
 ## Observação
 
-Por falta de tempo, não foi possível relacionar as entidades no banco de dados. No entanto, o código do back-end já está preparado para isso.
+- Por falta de tempo, não foi possível relacionar as entidades no banco de dados. No entanto, o código do back-end já está preparado para isso.
+- API de validação de cep foi usada a opencep.com pois a http://cep.la/api expirou.
