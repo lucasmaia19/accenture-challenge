@@ -18,13 +18,13 @@ namespace LucasChallenge.Api.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            return Ok(applicationServiceCompany.GetAll());
+            return Ok(applicationServiceCompany.GetCompany());
         }
 
         [HttpGet("{id}")]
         public ActionResult<string> Get(long id)
         {
-            return Ok(applicationServiceCompany.GetById(id));
+            return Ok(applicationServiceCompany.GetCompanyById(id));
         }
 
         [HttpPost]

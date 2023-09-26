@@ -161,6 +161,8 @@ import axios from "axios";
 import { mask } from 'vue-the-mask';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import { validateCnpj } from './../../Utils/validateCnpj';
+import { validateCep } from './../../Utils/validateCep';
 
 export default {
   directives: {
@@ -211,22 +213,29 @@ export default {
     }
   },
   methods: {
+    async addCompany(payload) {
+      try {
+        if (!validateCnpj(payload.cnpj)) {
+          toast.warning("CNPJ Inválido!");
+          return;
+        } 
+        var result = await validateCep(payload.cep)
+        if (result) {
+          const path = "https://localhost:7253/company";
+          const response = await axios.post(path, payload);
 
-    addCompany(payload) {
-      const path = "https://localhost:7253/company";
-      axios
-        .post(path, payload)
-        .then((res) => {
-          toast.success(res.data, { autoClose: 1000, });
+          toast.success(response.data, { autoClose: 1000 });
+          this.toggleaddCompanyModal();
+          this.initForm();
           this.getCompanies();
-        })
-        .catch((error) => {
-          toast.error("Erro ao adicionar Empresa", { autoClose: 1000, });
-          console.log(error);
-          this.getCompanies();
-        });
+        } else {
+          toast.warning("CEP inválido!");
+        }
+      } catch (error) {
+        toast.error("Erro ao cadastrar empresa", { autoClose: 1000, });
+        console.error(error);
+      }
     },
-
     changePage(page) {
       if (page >= 1 && page <= this.totalPages) {
         this.currentPage = page;
@@ -256,17 +265,15 @@ export default {
       return parseInt(uniqueId, 10); // Converte para número inteiro
     },
     handleAddSubmit() {
-      this.toggleaddCompanyModal();
       const payload = {
-        id: this.generateUniqueId(),
         cnpj: this.addCompanyForm.cnpj,
         fantasyName: this.addCompanyForm.fantasyName,
         cep: this.addCompanyForm.cep,
       };
       this.addCompany(payload);
-      this.initForm();
     },
     initForm() {
+      this.hasValidateCep = false;
       this.addCompanyForm.cep = "";
       this.addCompanyForm.cnpj = "";
       this.addCompanyForm.fantasyName = [];
@@ -338,14 +345,12 @@ export default {
       this.removeCompany(data);
     },
     removeCompany(company) {
-      const path = `https://localhost:7253/company`;  // URL para a requisição DELETE (sem o ID)
+      const path = `https://localhost:7253/company`;
 
-      // Adicionamos um cabeçalho personalizado para indicar que estamos enviando um corpo JSON
       const headers = {
         'Content-Type': 'application/json'
       };
 
-      // Enviando o objeto company como uma string JSON no corpo
       axios.delete(path, {
         headers,
         data: JSON.stringify(company)

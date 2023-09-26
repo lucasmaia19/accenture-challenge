@@ -10,8 +10,11 @@ namespace LucasChallenge.Aplication.Interfaces
 
         void Remove(SupplierDto supplierDto);
 
-        IEnumerable<SupplierDto> GetAll();
+        //IEnumerable<SupplierDto> GetAll();
 
         SupplierDto GetById(long id);
+
+        ICollection<SupplierDto> GetSupplier();
+        SupplierDto GetSupplierById(long supplierId);
     }
 }

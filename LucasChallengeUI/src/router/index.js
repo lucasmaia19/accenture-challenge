@@ -1,5 +1,4 @@
 import {createRouter, createWebHistory} from "vue-router";
-import Ping from "../components/Ping.vue";
 import Company from "../components/Company/Company.vue";
 import Supplier from "../components/Supplier/Supplier.vue";
 
@@ -15,11 +14,6 @@ const router = createRouter({
             path: "/supplier",
             name: "Supplier",
             component: Supplier,
-        },
-        {
-            path: "/ping",
-            name: "ping",
-            component: Ping,
         },
         /* {
           path: '/about',

@@ -1,6 +1,7 @@
 ﻿using LucasChallenge.Domain.Core.Interfaces.Repositories;
 using LucasChallenge.Domain.Core.Interfaces.Services;
 using LucasChallenge.Domain.Entities;
+using System.Net.Sockets;
 
 namespace LucasChallenge.Domain.Services
 {
@@ -12,5 +13,11 @@ namespace LucasChallenge.Domain.Services
         {
             this.repositoryCompany = repositoryCompany;
         }
+
+        public  ICollection<Company> GetCompany()
+            => repositoryCompany.GetCompany();
+        
+        public  Company GetCompanyById(long companyId)
+            => repositoryCompany.GetCompanyById(companyId);
     }
 }

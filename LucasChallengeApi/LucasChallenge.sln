@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LucasChallenge.Domain.Servi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LucasChallenge.Infrastructure", "LucasChallenge.Infrastructure\LucasChallenge.Infrastructure.csproj", "{8F29C529-F07E-403D-9684-451FA5246E66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LucasChallenge.Api", "LucasChallenge.Api\LucasChallenge.Api.csproj", "{CEE59283-9508-42A0-99C0-C86D9BAA51A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LucasChallenge.Api", "LucasChallenge.Api\LucasChallenge.Api.csproj", "{CEE59283-9508-42A0-99C0-C86D9BAA51A0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

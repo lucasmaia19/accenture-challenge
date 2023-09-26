@@ -1,7 +1,9 @@
 ﻿using LucasChallenge.Aplication.Dtos;
 using LucasChallenge.Aplication.Interfaces;
 using LucasChallenge.Domain.Core.Interfaces.Services;
+using LucasChallenge.Domain.Exceptions;
 using LucasChallenge.Infrastructure.CrossCutting.Interfaces;
+using LucasChallenge.Infrastructure.CrossCutting.Mapper;
 
 namespace LucasChallenge.Aplication
 {
@@ -18,15 +20,26 @@ namespace LucasChallenge.Aplication
 
         public void Add(SupplierDto supplierDto)
         {
-            var supplier = mapperSupplier.MapperDtoToEntity(supplierDto);
-            serviceSupplier.Add(supplier);
+            var result = GetSupplier();
+            var hasCnpj = result.Any(supplier => supplier.cnpj_cpf == supplierDto.cnpj_cpf);
+
+            if (hasCnpj)
+            {
+                throw new ExpectionsResult("Documento já existente.");
+            }
+            else
+            {
+                var supplier = mapperSupplier.MapperDtoToEntity(supplierDto);
+                serviceSupplier.Add(supplier);
+            }
+
         }
 
-        public IEnumerable<SupplierDto> GetAll()
-        {
-            var supplies = serviceSupplier.GetAll();
-            return mapperSupplier.MapperListSupplierDto(supplies);
-        }
+        //public IEnumerable<SupplierDto> GetAll()
+        //{
+        //    var supplies = serviceSupplier.GetAll();
+        //    return mapperSupplier.MapperListSupplierDto(supplies);
+        //}
 
         public SupplierDto GetById(long id)
         {
@@ -44,6 +57,17 @@ namespace LucasChallenge.Aplication
         {
             var supplier = mapperSupplier.MapperDtoToEntity(supplierDto);
             serviceSupplier.Update(supplier);
+        }
+
+        public ICollection<SupplierDto> GetSupplier()
+        {
+            var suppliers = serviceSupplier.GetSupplier();
+            return mapperSupplier.MapperListSupplierDto(suppliers);
+        }
+        public SupplierDto GetSupplierById(long supplierId)
+        {
+            var companies = serviceSupplier.GetSupplierById(supplierId);
+            return mapperSupplier.MapperEntityToDto(companies);
         }
     }
 }

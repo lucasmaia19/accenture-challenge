@@ -7,7 +7,7 @@ namespace LucasChallenge.Infrastructure.CrossCutting.Interfaces
     {
         Supplier MapperDtoToEntity(SupplierDto supplierDto);
 
-        IEnumerable<SupplierDto> MapperListSupplierDto(IEnumerable<Supplier> suppliers);
+        ICollection<SupplierDto> MapperListSupplierDto(ICollection<Supplier> suppliers);
 
         SupplierDto MapperEntityToDto(Supplier supplier);
     }

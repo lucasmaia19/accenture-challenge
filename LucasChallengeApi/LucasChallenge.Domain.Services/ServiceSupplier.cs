@@ -12,5 +12,11 @@ namespace LucasChallenge.Domain.Services
         {
             this.repositorySupplier = repositorySupplier;
         }
+
+        public ICollection<Supplier> GetSupplier()
+        => repositorySupplier.GetSupplier();
+
+        public Supplier GetSupplierById(long supplierId)
+            => repositorySupplier.GetSupplierById(supplierId);
     }
 }

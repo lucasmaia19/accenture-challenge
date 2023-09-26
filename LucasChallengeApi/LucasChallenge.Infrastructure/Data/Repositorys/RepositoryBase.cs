@@ -19,29 +19,9 @@ namespace LucasChallenge.Infra.Data.Data.Repositorys
                 sqlContext.Set<T>().Add(obj);
                 sqlContext.SaveChanges();
             }
-            catch (DbUpdateException ex)
-            {
-                // Log the exception message and any relevant details
-                Console.WriteLine("DbUpdateException: " + ex.Message);
-
-                // Get the innermost exception
-                Exception innerException = ex;
-                while (innerException.InnerException != null)
-                {
-                    innerException = innerException.InnerException;
-                }
-
-                // Log or handle the inner exception
-                Console.WriteLine("Inner Exception: " + innerException.Message);
-                // Optionally, throw the original exception or a custom one
-                throw;
-            }
             catch (Exception ex)
             {
-                // Log or handle other exceptions
-                Console.WriteLine("An unexpected error occurred: " + ex.Message);
-                // Optionally, throw the original exception or a custom one
-                throw;
+                throw ex;
             }
         }
 

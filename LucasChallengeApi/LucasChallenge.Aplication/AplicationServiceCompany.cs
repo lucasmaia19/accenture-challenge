@@ -1,7 +1,10 @@
 ﻿using LucasChallenge.Aplication.Dtos;
 using LucasChallenge.Aplication.Interfaces;
 using LucasChallenge.Domain.Core.Interfaces.Services;
+using LucasChallenge.Domain.Entities;
+using LucasChallenge.Domain.Exceptions;
 using LucasChallenge.Infrastructure.CrossCutting.Interfaces;
+using LucasChallenge.Infrastructure.CrossCutting.Mapper;
 
 namespace LucasChallenge.Aplication
 {
@@ -18,14 +21,19 @@ namespace LucasChallenge.Aplication
 
         public void Add(CompanyDto companyDto)
         {
-            var company = mapperCompany.MapperDtoToEntity(companyDto);
-            serviceCompany.Add(company);
-        }
+            var result = GetCompany();
+            var hasCnpj = result.Any(company => company.cnpj == companyDto.cnpj);
 
-        public IEnumerable<CompanyDto> GetAll()
-        {
-            var companies = serviceCompany.GetAll();
-            return mapperCompany.MapperListCompanyDto(companies);
+            if (hasCnpj)
+            {
+                throw new ExpectionsResult("CNPJ já existente.");
+            }
+            else
+            {
+                var company = mapperCompany.MapperDtoToEntity(companyDto);
+                serviceCompany.Add(company);
+            }
+
         }
 
         public CompanyDto GetById(long id)
@@ -44,6 +52,22 @@ namespace LucasChallenge.Aplication
         {
             var company = mapperCompany.MapperDtoToEntity(companyDto);
             serviceCompany.Update(company);
+        }   
+        
+        public ICollection<CompanyDto> GetCompany()
+        {
+            var companies = serviceCompany.GetCompany();
+            return mapperCompany.MapperListCompanyDto2(companies);
+        }
+        public CompanyDto GetCompanyById(long companyId)
+        {
+            var companies = serviceCompany.GetCompanyById(companyId);
+            return mapperCompany.MapperEntityToDto(companies);
+        }
+
+        IEnumerable<CompanyDto> IAplicationServiceCompany.GetAll()
+        {
+            throw new NotImplementedException();
         }
     }
 }

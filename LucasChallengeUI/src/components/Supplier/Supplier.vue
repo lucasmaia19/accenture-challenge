@@ -3,82 +3,157 @@
         <div class="row">
             <div class="col-sm-10">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h1>Fornecedor</h1>
+                    <h1>Fornecedores</h1>
                     <button class="btn btn-secondary btn-sm" type="button" @click="toCompany">
                         Empresas
                     </button>
                 </div>
                 <hr />
                 <br /><br />
-                <button class="btn btn-success btn-sm" type="button" @click="toggleAddBookModal">
-                    Adicionar Fornecedor
-                </button>
+                <div class="d-flex align-items-center justify-content-between">
+
+                    <button class="btn btn-success btn-sm" type="button" @click="toggleaddSupplierModal">
+                        Adicionar Fornecedor
+                    </button>
+                    <div class="d-flex gap-2 align-items-center">
+
+                        <form class="d-flex gap-2 align-items-center">
+                            <div class="mb-3">
+                                <label class="form-label" for="filterCpfCnpjid">CPF/CNPJ:</label>
+                                <input id="filterCpfCnpjid" v-model="filter.filterCpfCnpj" class="form-control"
+                                    placeholder="Digite seu Documento" type="text"
+                                    v-mask="['###.###.###-##', '##.###.###/####-##']" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="filterNameid">Nome:</label>
+                                <input id="filterNameid" v-model="filter.filterName" class="form-control"
+                                    placeholder="Digite seu nome" type="text" />
+                            </div>
+                            <button class="btn btn-secondary btn-sm mt-3" type="button" @click="applyFilter">
+                                Pesquisar
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
                 <br /><br />
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">Documento</th>
-                            <th scope="col">Nome</th>
-                            <th scope="col">E-mail</th>
-                            <th scope="col">Cep</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(suppliers, index) in suppliers" :key="index">
-                            <td>{{ suppliers.cnpj_cpf }}</td>
-                            <td>{{ suppliers.name }}</td>
-                            <td>{{ suppliers.email }}</td>
-                            <td>{{ suppliers.cep }}</td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <button class="btn btn-warning btn-sm" type="button" @click="toggleEditBookModal(book)">
-                                        Update
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" type="button" @click="handleDeleteBook(book)">
-                                        Delete
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+
+                <div class="d-flex flex-column align-items-center">
+                    <table class="table table-hover">
+                        <!-- Cabeçalho da tabela -->
+                        <thead>
+                            <tr>
+                                <th scope="col">Documento</th>
+                                <th scope="col">Nome</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Cep</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Renderiza as linhas da tabela baseadas na página atual e quantidade de itens por página -->
+                            <tr v-for="(supplier, index) in paginatedSupplies" :key="index">
+                                <td>{{ supplier.cnpj_cpf }}</td>
+                                <td>{{ supplier.name }}</td>
+                                <td>{{ supplier.email }}</td>
+                                <td>{{ supplier.cep }}</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-warning btn-sm mx-2" type="button"
+                                            @click="toggleeditSupplierModal(supplier)">
+                                            Atualizar
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" type="button"
+                                            @click="() => handleDeleteSupplier(supplier.id)">
+                                            Deletar
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Paginação -->
+                    <nav>
+                        <ul class="pagination">
+                            <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
+                                <button class="page-link" @click="changePage(currentPage - 1)" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </button>
+                            </li>
+                            <li class="page-item" v-for="page in pages" :key="page"
+                                :class="{ 'active': page === currentPage }">
+                                <button class="page-link" @click="changePage(page)">{{ page }}</button>
+                            </li>
+                            <li class="page-item" :class="{ 'disabled': currentPage === totalPages }">
+                                <button class="page-link" @click="changePage(currentPage + 1)" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
             </div>
         </div>
     </div>
-    <!-- add new book modal -->
-    <div ref="addBookModal" :class="{ show: activeAddBookModal, 'd-block': activeAddBookModal }" class="modal fade"
-        role="dialog" tabindex="-1">
+    <!-- add new supplier modal -->
+    <div ref="addSupplierModal" :class="{ show: activeAddSupplierModal, 'd-block': activeAddSupplierModal }"
+        class="modal fade" role="dialog" tabindex="-1">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add a new book</h5>
-                    <button aria-label="Close" class="close" data-dismiss="modal" type="button" @click="toggleAddBookModal">
+                    <h5 class="modal-title">Adicionar novo Fornecedor</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button"
+                        @click="toggleaddSupplierModal">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label pe-2" for="addSupplierCNPJ_CPF">Pessoa Física?</label>
+                        <input id="addSupplierCNPJ_CPF" v-model="addSupplierForm.isPessoaFisica" class="form-check-input"
+                            type="checkbox" @click="toggleIsPessoaFisica('add')" />
+                    </div>
                     <form>
                         <div class="mb-3">
-                            <label class="form-label" for="addBookTitle">Title:</label>
-                            <input id="addBookTitle" v-model="addBookForm.title" class="form-control"
-                                placeholder="Enter title" type="text" />
+                            <label class="form-label" for="addSupplierCNPJ_CPF">CPF/CNPJ:</label>
+                            <input id="addSupplierCNPJ_CPF" v-model="addSupplierForm.cnpj_cpf" class="form-control"
+                                placeholder="Digite seu Documento" type="text"
+                                v-mask="['###.###.###-##', '##.###.###/####-##']" />
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" for="addBookAuthor">Author:</label>
-                            <input id="addBookAuthor" v-model="addBookForm.author" class="form-control"
-                                placeholder="Enter author" type="text" />
+                            <label class="form-label" for="addSupplierFantasyName">Nome:</label>
+                            <input id="addSupplierFantasyName" v-model="addSupplierForm.name" class="form-control"
+                                placeholder="Digite o Nome" type="text" />
                         </div>
-                        <div class="mb-3 form-check">
-                            <input id="addBookRead" v-model="addBookForm.read" class="form-check-input" type="checkbox" />
-                            <label class="form-check-label" for="addBookRead">Read?</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="addSupplierFantasyEmail">Email:</label>
+                            <input id="addSupplierFantasyEmail" v-model="addSupplierForm.email" class="form-control"
+                                placeholder="Digite o Email" type="email" />
                         </div>
-                        <div class="btn-group" role="group">
-                            <button class="btn btn-primary btn-sm" type="button" @click="handleAddSubmit">
-                                Submit
+                        <div class="mb-3">
+                            <label class="form-label" for="addSupplierCep">Cep:</label>
+                            <input id="addSupplierCep" v-model="addSupplierForm.cep" class="form-control"
+                                placeholder="Digite o CEP" type="text" v-mask="'#####-###'" />
+                        </div>
+                        <div class="mb-3" v-if="addSupplierForm.isPessoaFisica">
+                            <label class="form-label" for="addSupplierRg">RG:</label>
+                            <input id="addSupplierRg" v-model="addSupplierForm.rg" class="form-control"
+                                placeholder="Digite seu RG" type="text" v-mask="'###.###.##-#'" />
+                        </div>
+
+                        <div class="mb-3" v-if="addSupplierForm.isPessoaFisica">
+                            <label class="form-label" for="addSupplierBirth_Data">Data de nascimento:</label>
+                            <input id="addSupplierBirth_Data" v-model="addSupplierForm.birth_data" class="form-control"
+                                placeholder="Digite sua data de nascimento" type="date" />
+                        </div>
+                        <div class="btn-group d-flex mb-3 mt-4" role="group">
+                            <button class="btn btn-primary btn-sm mx-2" type="button" @click="handleAddSubmit">
+                                Salvar
                             </button>
                             <button class="btn btn-danger btn-sm" type="button" @click="handleAddReset">
-                                Reset
+                                Resetar
                             </button>
                         </div>
                     </form>
@@ -86,41 +161,64 @@
             </div>
         </div>
     </div>
-    <div v-if="activeAddBookModal" class="modal-backdrop fade show"></div>
-    <!-- edit book modal -->
-    <div ref="editBookModal" :class="{ show: activeEditBookModal, 'd-block': activeEditBookModal }" class="modal fade"
-        role="dialog" tabindex="-1">
+    <div v-if="activeAddSupplierModal" class="modal-backdrop fade show"></div>
+    <!-- edit supplier modal -->
+    <div ref="editSupplierModal" :class="{ show: activeeditSupplierModal, 'd-block': activeeditSupplierModal }"
+        class="modal fade" role="dialog" tabindex="-1">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Update</h5>
+                    <h5 class="modal-title">Atualizar Empresa</h5>
                     <button aria-label="Close" class="close" data-dismiss="modal" type="button"
-                        @click="toggleEditBookModal">
+                        @click="toggleeditSupplierModal">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label pe-2" for="editSupplierPf">Pessoa Física?</label>
+                        <input id="editSupplierPf" class="form-check-input" type="checkbox"
+                            @click="toggleIsPessoaFisica('edit')" v-model="editSupplierForm.pf" />
+                    </div>
                     <form>
                         <div class="mb-3">
-                            <label class="form-label" for="editBookTitle">Title:</label>
-                            <input id="editBookTitle" v-model="editBookForm.title" class="form-control"
-                                placeholder="Enter title" type="text">
+                            <label class="form-label" for="editSupplierCNPJ_CPF">CPF/CNPJ:</label>
+                            <input id="editSupplierCNPJ_CPF" v-model="editSupplierForm.cnpj_cpf" class="form-control"
+                                placeholder="Digite seu Documento" type="text"
+                                v-mask="['###.###.###-##', '##.###.###/####-##']" />
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" for="editBookAuthor">Author:</label>
-                            <input id="editBookAuthor" v-model="editBookForm.author" class="form-control"
-                                placeholder="Enter author" type="text">
+                            <label class="form-label" for="editSupplierFantasyName">Nome:</label>
+                            <input id="editSupplierFantasyName" v-model="editSupplierForm.name" class="form-control"
+                                placeholder="Digite o Nome" type="text" />
                         </div>
-                        <div class="mb-3 form-check">
-                            <input id="editBookRead" v-model="editBookForm.read" class="form-check-input" type="checkbox">
-                            <label class="form-check-label" for="editBookRead">Read?</label>
+                        <div class="mb-3">
+                            <label class="form-label" for="editSupplierFantasyEmail">Email:</label>
+                            <input id="editSupplierFantasyEmail" v-model="editSupplierForm.email" class="form-control"
+                                placeholder="Digite o Email" type="email" />
                         </div>
-                        <div class="btn-group" role="group">
-                            <button class="btn btn-primary btn-sm" type="button" @click="handleEditSubmit">
-                                Submit
+                        <div class="mb-3">
+                            <label class="form-label" for="editSupplierCep">Cep:</label>
+                            <input id="editSupplierCep" v-model="editSupplierForm.cep" class="form-control"
+                                placeholder="Digite o CEP" type="text" v-mask="'#####-###'" />
+                        </div>
+                        <div class="mb-3" v-if="editSupplierForm.pf">
+                            <label class="form-label" for="editSupplierRg">RG:</label>
+                            <input id="editSupplierRg" v-model="editSupplierForm.rg" class="form-control"
+                                placeholder="Digite seu RG" type="text" v-mask="'###.###.##-#'" />
+                        </div>
+
+                        <div class="mb-3" v-if="editSupplierForm.pf">
+                            <label class="form-label" for="editSupplierBirth_Data">Data de nascimento:</label>
+                            <input id="editSupplierBirth_Data" v-model="editSupplierForm.birth_data" class="form-control"
+                                placeholder="Digite sua data de nascimento" type="date" />
+                        </div>
+                        <div class="btn-group d-flex mb-3 mt-3" role="group">
+                            <button class="btn btn-primary btn-sm mx-2" type="button" @click="handleEditSubmit">
+                                Salvar
                             </button>
                             <button class="btn btn-danger btn-sm" type="button" @click="handleEditCancel">
-                                Cancel
+                                Cancelar
                             </button>
                         </div>
                     </form>
@@ -128,162 +226,294 @@
             </div>
         </div>
     </div>
-    <div v-if="activeEditBookModal" class="modal-backdrop fade show"></div>
+    <div v-if="activeeditSupplierModal" class="modal-backdrop fade show"></div>
 </template>
   
 <script>
+
 import axios from "axios";
+import { mask } from 'vue-the-mask';
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+import { validateCnpj } from './../../Utils/validateCnpj';
+import { validateCpf } from './../../Utils/validateCpf';
+import { validateCep } from './../../Utils/validateCep';
+
 export default {
+    directives: {
+        directives: { mask }
+    },
     data() {
         return {
-            activeAddBookModal: false,
-            addBookForm: {
+            path: "https://localhost:7253/supplier",
+            activeAddSupplierModal: false,
+            addSupplierForm: {
                 id: "",
-                title: "",
-                author: "",
-                read: [],
+                cnpj_cpf: "",
+                name: "",
+                email: "",
+                cep: "",
+                pf: false,
+                rg: "",
+                birth_data: "",
             },
-            activeEditBookModal: false,
-            editBookForm: {
-                id: '',
-                title: '',
-                author: '',
-                read: [],
+            activeeditSupplierModal: false,
+            editSupplierForm: {
+                id: "",
+                cnpj_cpf: "",
+                name: "",
+                email: "",
+                cep: "",
+                pf: false,
+                rg: "",
+                birth_data: "",
             },
             suppliers: [],
             message: "",
+            messageError: "",
             showMessage: false,
+            showMessageError: false,
+            currentPage: 1,
+            itemsPerPage: 5,
+            filter: {
+                filterCpfCnpj: "",
+                filterName: "",
+            }
         };
     },
     components: {
     },
+    computed: {
+        totalPages() {
+            return Math.ceil(this.suppliers.length / this.itemsPerPage);
+        },
+        paginatedSupplies() {
+            const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+            const endIndex = startIndex + this.itemsPerPage;
+            return this.suppliers.slice(startIndex, endIndex);
+        },
+        pages() {
+            const pagesArray = [];
+            for (let i = 1; i <= this.totalPages; i++) {
+                pagesArray.push(i);
+            }
+            return pagesArray;
+        }
+    },
     methods: {
-        addBook(payload) {
-            const path = "http://127.0.0.1:5000/books";
-            axios
-                .post(path, payload)
-                .then(() => {
-                    this.getBooks();
-                    this.message = "Book added";
-                    this.showMessage = true;
-                })
-                .catch((error) => {
-                    console.log(error);
-                    this.getBooks();
-                });
+        async addSupplier(payload) {
+            try {
+                var resultDocument = await this.validateRegiter(payload.cnpj_cpf)
+                var resultCep = await validateCep(payload.cep)
+                if (!resultCep) toast.warning("CEP inválido!", { autoClose: 1000, });
+
+                if (resultCep && resultDocument) {
+                    console.log(this.path)
+                    console.log(payload)
+                    const response = await axios.post(this.path, payload);
+
+                    toast.success(response.data, { autoClose: 1000 });
+                    this.toggleaddSupplierModal();
+                    this.initForm();
+                    this.getSuppliers();
+                }
+            } catch (error) {
+                toast.warning("Documento já cadastrado!", { autoClose: 1000 });
+                console.error(error);
+            }
         },
-        toCompany() {
-            this.$router.push('/');
+        changePage(page) {
+            if (page >= 1 && page <= this.totalPages) {
+                this.currentPage = page;
+            }
         },
-        getBooks() {
-            const path = "https://localhost:7253/supplier";
+        applyFilter() {
+            if (this.filter.filterName === "" && this.filter.filterCpfCnpj === "") {
+                this.getSuppliers()
+            }
+            const filteredSuppliers = this.suppliers.filter(item => {
+                const matchesFilterName = item.name.includes(this.filter.filterName);
+                const matchesFilterCpfCnpj = item.cnpj_cpf.includes(this.filter.filterCpfCnpj);
+
+                return matchesFilterName && matchesFilterCpfCnpj;
+            });
+
+            this.suppliers = filteredSuppliers;
+        },
+        async validateRegiter(document) {
+            const cnpjLength = 14;
+            const cpfLength = 11;
+            const cleanedCnpj = document.replace(/[^\d]/g, '');
+            const length = cleanedCnpj.length;
+
+            if (length === cnpjLength && !validateCnpj(document)) {
+                toast.warning("CNPJ Inválido!", { autoClose: 1000, });
+                return false;
+            } else if (length === cpfLength && !validateCpf(document)) {
+                toast.warning("CPF Inválido!", { autoClose: 1000, });
+                return false;
+            } else if (length < 11) {
+                toast.warning("Documento Inválido!", { autoClose: 1000, });
+                return false;
+            }
+            return true;
+        },
+        toggleIsPessoaFisica(type) {
+            if (type === 'add') {
+                this.addSupplierForm.pf = !this.addSupplierForm.pf;
+            } else if (type === 'edit') {
+                this.editSupplierForm.pf = !this.editSupplierForm.pf;
+                if (!this.editSupplierForm.pf) {
+                    this.editSupplierForm.pf = false,
+                        this.editSupplierForm.rg = "",
+                        this.editSupplierForm.birth_data = ""
+
+                    this.addSupplierForm.pf = false,
+                        this.addSupplierForm.rg = "",
+                        this.addSupplierForm.birth_data = ""
+                }
+            }
+        },
+        getSuppliers() {
             axios
-                .get(path)
+                .get(this.path)
                 .then((res) => {
                     this.suppliers = res.data;
                 })
                 .catch((error) => {
+                    toast.error("Erro ao carregar dados", { autoClose: 1000, });
                     console.error(error);
                 });
         },
         handleAddReset() {
             this.initForm();
         },
+        generateUniqueId() {
+            const timestamp = Date.now();
+            const randomNumber = Math.floor(Math.random() * 100000);
+
+            const uniqueId = `${timestamp}${randomNumber}`;
+
+            return parseInt(uniqueId, 10); // Converte para número inteiro
+        },
         handleAddSubmit() {
-            this.toggleAddBookModal();
-            let read = false;
-            if (this.addBookForm.read[0]) {
-                read = true;
-            }
             const payload = {
-                title: this.addBookForm.title,
-                author: this.addBookForm.author,
-                read, // property shorthand
+                cnpj_cpf: this.addSupplierForm.cnpj_cpf,
+                name: this.addSupplierForm.name,
+                email: this.addSupplierForm.email,
+                cep: this.addSupplierForm.cep,
+                pf: this.addSupplierForm.pf,
+                rg: this.addSupplierForm.rg,
+                birth_data: this.addSupplierForm.birth_data,
             };
-            this.addBook(payload);
-            this.initForm();
+            this.addSupplier(payload);
         },
         initForm() {
-            this.addBookForm.title = "";
-            this.addBookForm.author = "";
-            this.addBookForm.read = [];
-            this.editBookForm.id = "";
-            this.editBookForm.title = "";
-            this.editBookForm.author = "";
-            this.editBookForm.read = [];
-        },
-        toSupplier() {
+            this.hasValidateCep = false;
+            this.addSupplierForm.pf = false;
+            this.addSupplierForm.cnpj_cpf = "",
+            this.addSupplierForm.name = "",
+            this.addSupplierForm.email = "",
+            this.addSupplierForm.cep = "",
+            this.addSupplierForm.rg = "",
+            this.addSupplierForm.birth_data = "",
 
+            this.editSupplierForm.cnpj_cpf = "",
+            this.editSupplierForm.pf = false,
+            this.editSupplierForm.name = "",
+            this.editSupplierForm.email = "",
+            this.editSupplierForm.cep = "",
+            this.editSupplierForm.rg = "",
+            this.editSupplierForm.birth_data = "";
         },
-        toggleAddBookModal() {
+        toCompany() {
+            this.$router.push('/');
+        },
+        toggleaddSupplierModal() {
             const body = document.querySelector("body");
-            this.activeAddBookModal = !this.activeAddBookModal;
-            if (this.activeAddBookModal) {
+            this.activeAddSupplierModal = !this.activeAddSupplierModal;
+            if (this.activeAddSupplierModal) {
                 body.classList.add("modal-open");
             } else {
                 body.classList.remove("modal-open");
             }
         },
-        toggleEditBookModal(book) {
-            if (book) {
-                this.editBookForm = book;
+        toggleeditSupplierModal(supplier) {
+            if (supplier) {
+                this.editSupplierForm = supplier;
             }
             const body = document.querySelector("body");
-            this.activeEditBookModal = !this.activeEditBookModal;
-            if (this.activeEditBookModal) {
+            this.activeeditSupplierModal = !this.activeeditSupplierModal;
+            if (this.activeeditSupplierModal) {
                 body.classList.add("modal-open");
             } else {
                 body.classList.remove("modal-open");
             }
         },
         handleEditSubmit() {
-            this.toggleEditBookModal(null);
-            let read = false;
-            if (this.editBookForm.read) read = true;
+            this.toggleeditSupplierModal(null);
             const payload = {
-                title: this.editBookForm.title,
-                author: this.editBookForm.author,
-                read,
+                id: this.editSupplierForm.id,
+                cnpj_cpf: this.editSupplierForm.cnpj_cpf,
+                name: this.editSupplierForm.name,
+                email: this.editSupplierForm.email,
+                cep: this.editSupplierForm.cep,
+                pf: this.editSupplierForm.pf,
+                rg: this.editSupplierForm.rg,
+                birth_data: this.editSupplierForm.birth_data
             };
-            this.updateBook(payload, this.editBookForm.id);
+            this.updateSupplier(payload);
         },
-        updateBook(payload, bookID) {
-            const path = `http://127.0.0.1:5000/books/${bookID}`;
-            axios.put(path, payload)
-                .then(() => {
-                    this.getBooks();
-                    this.message = 'Book updated!';
-                    this.showMessage = true;
+        updateSupplier(payload) {
+            axios.put(this.path, payload)
+                .then((res) => {
+                    this.getSuppliers();
+                    toast.success(res.data, { autoClose: 1000, });
                 })
                 .catch((error) => {
+                    toast.error("Erro ao atualizar fornecedor", { autoClose: 1000, });
                     console.error(error);
-                    this.getBooks();
+                    this.getSuppliers();
                 });
         },
         handleEditCancel() {
-            this.toggleEditBookModal(null);
+            this.toggleeditSupplierModal(null);
             this.initForm();
-            this.getBooks(); // why?
+            this.getSuppliers();
         },
-        handleDeleteBook(book) {
-            this.removeBook(book.id);
+        handleDeleteSupplier(supplierId) {
+            var data = {
+                id: supplierId,
+                cnpj_cpf: "",
+                name: "",
+                email: "",
+                cep: "",
+                pf: false,
+                rg: "",
+                birth_data: ""
+            }
+            this.removeSupplier(data);
         },
-        removeBook(bookID) {
-            const path = `http://127.0.0.1:5000/books/${bookID}`;
-            axios.delete(path)
-                .then(() => {
-                    this.getBooks();
-                    this.message = 'Book removed!';
-                    this.showMessage = true;
+        removeSupplier(supplier) {
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            axios.delete(this.path, {
+                headers,
+                data: JSON.stringify(supplier)
+            })
+                .then((res) => {
+                    toast.success(res.data, { autoClose: 1000, });
+                    this.getSuppliers();
                 })
                 .catch((error) => {
-                    console.error(error);
-                    this.getBooks();
+                    toast.success("Erro ao deletar empresa", { autoClose: 1000, });
+                    this.getSuppliers();
                 });
         },
     },
     created() {
-        this.getBooks();
+        this.getSuppliers();
     },
 };
 </script>

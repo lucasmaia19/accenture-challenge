@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using LucasChallenge.Domain.Entities;
+using System.Text.Json.Serialization;
 
 namespace LucasChallenge.Aplication.Dtos
 {
@@ -13,5 +10,10 @@ namespace LucasChallenge.Aplication.Dtos
         public string name { get; set; }
         public string email { get; set; }
         public string cep { get; set; }
+        public bool pf { get; set; }
+        public string? rg { get; set; }
+        public string? birth_data { get; set; }
+
+        public ICollection<CompanyDto>? companies { get; set; }
     }
 }

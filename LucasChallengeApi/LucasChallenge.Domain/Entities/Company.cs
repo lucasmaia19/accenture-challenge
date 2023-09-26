@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.ConstrainedExecution;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace LucasChallenge.Domain.Entities
 {
@@ -12,5 +7,7 @@ namespace LucasChallenge.Domain.Entities
         public string cnpj { get; set; }
         public string fantasyName { get; set; }
         public string cep { get; set; }
+
+        public ICollection<Supplier>? suppliers { get; set; }
     }
 }

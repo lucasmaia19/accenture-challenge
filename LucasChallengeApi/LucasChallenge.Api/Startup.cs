@@ -19,13 +19,14 @@ namespace LucasChallenge.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var connection = Configuration["SqlConnection:SqlConnectionString"];
-            services.AddDbContext<SqlContext>(options => options.UseSqlServer(connection));
+            var connection = Configuration["ConnectionStrings:DefaultConnection"];
+            services.AddDbContext<SqlContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "API Model DDD", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Lucas Challenge API", Version = "v1" });
             });
         }
 

@@ -1,4 +1,5 @@
 ﻿using LucasChallenge.Aplication.Dtos;
+using LucasChallenge.Domain.Entities;
 
 namespace LucasChallenge.Aplication.Interfaces
 {
@@ -13,5 +14,9 @@ namespace LucasChallenge.Aplication.Interfaces
         IEnumerable<CompanyDto> GetAll();
 
         CompanyDto GetById(long id);
+
+        ICollection<CompanyDto> GetCompany();
+        CompanyDto GetCompanyById(long companyId);
+
     }
 }
