@@ -18,5 +18,7 @@ namespace LucasChallenge.Aplication.Interfaces
         ICollection<CompanyDto> GetCompany();
         CompanyDto GetCompanyById(long companyId);
 
+        Task<bool> ValidateCepAsync(string cep);
+
     }
 }

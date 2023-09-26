@@ -14,17 +14,17 @@ namespace LucasChallenge.Infrastructure.CrossCutting.Mapper
                 fantasyName = companyDto.fantasyName,
                 cep = companyDto.cep,
                 cnpj = companyDto.cnpj,
-                suppliers = companyDto.suppliers.Select(supplierDto => new Supplier
-                {
-                    Id = supplierDto.Id,
-                    name = supplierDto.name,
-                    email = supplierDto.email,
-                    cep = supplierDto.cep,
-                    pf = supplierDto.pf,
-                    cnpj_cpf = supplierDto.cnpj_cpf,
-                    birth_data = supplierDto.birth_data,
-                    rg = supplierDto.rg
-                }).ToList()
+                //suppliers = companyDto.suppliers.Select(supplierDto => new Supplier
+                //{
+                //    Id = supplierDto.Id,
+                //    name = supplierDto.name,
+                //    email = supplierDto.email,
+                //    cep = supplierDto.cep,
+                //    pf = supplierDto.pf,
+                //    cnpj_cpf = supplierDto.cnpj_cpf,
+                //    birth_data = supplierDto.birth_data,
+                //    rg = supplierDto.rg
+                //}).ToList()
             };
 
             return company;

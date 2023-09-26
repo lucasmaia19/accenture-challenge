@@ -23,6 +23,7 @@ namespace LucasChallenge.Aplication
         {
             var result = GetCompany();
             var hasCnpj = result.Any(company => company.cnpj == companyDto.cnpj);
+            var hasCep = ValidateCepAsync(companyDto.cep).Result;
 
             if (hasCnpj)
             {
@@ -68,6 +69,36 @@ namespace LucasChallenge.Aplication
         IEnumerable<CompanyDto> IAplicationServiceCompany.GetAll()
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<bool> ValidateCepAsync(string cep)
+        {
+            // A URL da API OpenCEP
+            cep = cep.Replace(".", "").Replace("-", "");
+            string apiUrl = $"https://opencep.com/v1/{cep}";
+
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    HttpResponseMessage response = await client.GetAsync(apiUrl);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string jsonResponse = await response.Content.ReadAsStringAsync();
+                        // Faz o parse do JSON para um objeto CompanyDto
+                        return true;
+                    }
+                    else
+                    {
+                        throw new Exception($"Erro ao validar CEP: {response.ReasonPhrase}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Erro ao chamar a API: {ex.Message}");
+                }
+            }
         }
     }
 }

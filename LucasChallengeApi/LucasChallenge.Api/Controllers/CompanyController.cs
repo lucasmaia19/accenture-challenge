@@ -1,6 +1,9 @@
 ﻿using LucasChallenge.Aplication.Dtos;
 using LucasChallenge.Aplication.Interfaces;
+using LucasChallenge.Domain.Entities;
+using LucasChallenge.Infra.Data.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LucasChallenge.Api.Controllers
 {
@@ -9,10 +12,12 @@ namespace LucasChallenge.Api.Controllers
     public class CompanyController : Controller
     {
         private readonly IAplicationServiceCompany applicationServiceCompany;
+        private readonly SqlContext sqlContext;
 
-        public CompanyController(IAplicationServiceCompany applicationServiceCompany)
+        public CompanyController(IAplicationServiceCompany applicationServiceCompany, SqlContext sqlContext)
         {
             this.applicationServiceCompany = applicationServiceCompany;
+            this.sqlContext = sqlContext;
         }
 
         [HttpGet]
@@ -42,6 +47,24 @@ namespace LucasChallenge.Api.Controllers
             {
                 throw ex;
             }
+        }
+
+        // TO-DO: adicionar esta regra nas outras camadas
+        [HttpPost("CompanySupplier")]
+        public async Task<ActionResult<Company>> AddCompanySupplier(CompanySupplierDto companySupplierDto)
+        {
+            var company = await sqlContext.Company
+                .Where(x => x.Id == companySupplierDto.companiesId)
+                .Include(x => x.suppliers)
+                .FirstOrDefaultAsync();
+
+            if (company == null) return NotFound();
+
+            var supplier = await sqlContext.Supplier.FindAsync(companySupplierDto.suppliersId);
+            if (supplier == null) return NotFound();
+            company.suppliers.Add(supplier);
+            await sqlContext.SaveChangesAsync();
+            return company;
         }
 
         [HttpPut]

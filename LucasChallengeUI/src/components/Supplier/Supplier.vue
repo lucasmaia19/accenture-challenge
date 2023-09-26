@@ -149,7 +149,7 @@
                                 placeholder="Digite sua data de nascimento" type="date" />
                         </div>
                         <div class="btn-group d-flex mb-3 mt-4" role="group">
-                            <button class="btn btn-primary btn-sm mx-2" type="button" @click="handleAddSubmit">
+                            <button :disabled="isButtonDisabled" class="btn btn-primary btn-sm mx-2" type="button" @click="handleAddSubmit">
                                 Salvar
                             </button>
                             <button class="btn btn-danger btn-sm" type="button" @click="handleAddReset">
@@ -214,7 +214,7 @@
                                 placeholder="Digite sua data de nascimento" type="date" />
                         </div>
                         <div class="btn-group d-flex mb-3 mt-3" role="group">
-                            <button class="btn btn-primary btn-sm mx-2" type="button" @click="handleEditSubmit">
+                            <button :disabled="isButtonDisabled" class="btn btn-primary btn-sm mx-2" type="button" @click="handleEditSubmit">
                                 Salvar
                             </button>
                             <button class="btn btn-danger btn-sm" type="button" @click="handleEditCancel">
@@ -274,6 +274,7 @@ export default {
             showMessage: false,
             showMessageError: false,
             currentPage: 1,
+            isButtonDisabled: false,
             itemsPerPage: 5,
             filter: {
                 filterCpfCnpj: "",
@@ -303,10 +304,11 @@ export default {
     methods: {
         async addSupplier(payload) {
             try {
+                this.isButtonDisabled = true
                 var resultDocument = await this.validateRegiter(payload.cnpj_cpf)
                 var resultCep = await validateCep(payload.cep)
                 if (!resultCep) toast.warning("CEP inválido!", { autoClose: 1000, });
-
+                
                 if (resultCep && resultDocument) {
                     console.log(this.path)
                     console.log(payload)
@@ -316,9 +318,12 @@ export default {
                     this.toggleaddSupplierModal();
                     this.initForm();
                     this.getSuppliers();
+                } else {
+                    this.isButtonDisabled = false;
                 }
             } catch (error) {
-                toast.warning("Documento já cadastrado!", { autoClose: 1000 });
+                this.isButtonDisabled = false
+                toast.warning("Revise os dados!", { autoClose: 1000 });
                 console.error(error);
             }
         },
@@ -405,10 +410,12 @@ export default {
                 pf: this.addSupplierForm.pf,
                 rg: this.addSupplierForm.rg,
                 birth_data: this.addSupplierForm.birth_data,
+                companies: []
             };
             this.addSupplier(payload);
         },
         initForm() {
+            this.isButtonDisabled = false
             this.hasValidateCep = false;
             this.addSupplierForm.pf = false;
             this.addSupplierForm.cnpj_cpf = "",
@@ -460,18 +467,22 @@ export default {
                 cep: this.editSupplierForm.cep,
                 pf: this.editSupplierForm.pf,
                 rg: this.editSupplierForm.rg,
-                birth_data: this.editSupplierForm.birth_data
+                birth_data: this.editSupplierForm.birth_data,
+                companies: []
             };
             this.updateSupplier(payload);
         },
         updateSupplier(payload) {
+            this.isButtonDisabled = true
             axios.put(this.path, payload)
                 .then((res) => {
                     this.getSuppliers();
                     toast.success(res.data, { autoClose: 1000, });
+                    this.initForm();
                 })
                 .catch((error) => {
-                    toast.error("Erro ao atualizar fornecedor", { autoClose: 1000, });
+                    this.isButtonDisabled = false
+                    toast.error("Erro ao atualizar fornecedor, revise os dados", { autoClose: 1000, });
                     console.error(error);
                     this.getSuppliers();
                 });
@@ -490,7 +501,8 @@ export default {
                 cep: "",
                 pf: false,
                 rg: "",
-                birth_data: ""
+                birth_data: "",
+                companies: []
             }
             this.removeSupplier(data);
         },
@@ -507,7 +519,7 @@ export default {
                     this.getSuppliers();
                 })
                 .catch((error) => {
-                    toast.success("Erro ao deletar empresa", { autoClose: 1000, });
+                    toast.error("Erro ao deletar empresa", { autoClose: 1000, });
                     this.getSuppliers();
                 });
         },

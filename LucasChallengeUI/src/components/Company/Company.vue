@@ -98,7 +98,7 @@
                 type="text" v-mask="'#####-###'" />
             </div>
             <div class="btn-group d-flex mb-3 mt-4" role="group">
-              <button class="btn btn-primary btn-sm mx-2" type="button" @click="handleAddSubmit">
+              <button :disabled="isButtonDisabled" class="btn btn-primary btn-sm mx-2" type="button" @click="handleAddSubmit">
                 Salvar
               </button>
               <button class="btn btn-danger btn-sm" type="button" @click="handleAddReset">
@@ -140,7 +140,7 @@
                 type="text" v-mask="'#####-###'">
             </div>
             <div class="btn-group d-flex mb-3 mt-3" role="group">
-              <button class="btn btn-primary btn-sm mx-2" type="button" @click="handleEditSubmit">
+              <button :disabled="isButtonDisabled" class="btn btn-primary btn-sm mx-2" type="button" @click="handleEditSubmit">
                 Salvar
               </button>
               <button class="btn btn-danger btn-sm" type="button" @click="handleEditCancel">
@@ -188,6 +188,7 @@ export default {
       message: "",
       messageError: "",
       showMessage: false,
+      isButtonDisabled: false,
       showMessageError: false,
       currentPage: 1,
       itemsPerPage: 5,
@@ -216,23 +217,33 @@ export default {
     async addCompany(payload) {
       try {
         if (!validateCnpj(payload.cnpj)) {
-          toast.warning("CNPJ Inválido!");
+          this.isButtonDisabled = false;
+          toast.warning("CNPJ Inválido!", { autoClose: 1000 });
           return;
-        } 
+        }
         var result = await validateCep(payload.cep)
         if (result) {
+          this.isButtonDisabled = true
           const path = "https://localhost:7253/company";
           const response = await axios.post(path, payload);
-
+          await this.getCompanies();
+          // payload.supplier.forEach(element => {
+          //   const payloadRelaction = {
+          //     companiesId: this.companies[length - 1],
+          //     supplierId: element.Id
+          //   }
+          //   await axios.post(this.path + "/CompanySupplier", payload);
+          // });
           toast.success(response.data, { autoClose: 1000 });
           this.toggleaddCompanyModal();
           this.initForm();
-          this.getCompanies();
         } else {
-          toast.warning("CEP inválido!");
+          this.isButtonDisabled = false;
+          toast.warning("CEP inválido!", { autoClose: 1000 });
         }
       } catch (error) {
-        toast.error("Erro ao cadastrar empresa", { autoClose: 1000, });
+        this.isButtonDisabled = false;
+        toast.error("Revise os dados", { autoClose: 1000, });
         console.error(error);
       }
     },
@@ -269,10 +280,12 @@ export default {
         cnpj: this.addCompanyForm.cnpj,
         fantasyName: this.addCompanyForm.fantasyName,
         cep: this.addCompanyForm.cep,
+        suppliers: []
       };
       this.addCompany(payload);
     },
     initForm() {
+      this.isButtonDisabled = false;
       this.hasValidateCep = false;
       this.addCompanyForm.cep = "";
       this.addCompanyForm.cnpj = "";
@@ -318,13 +331,16 @@ export default {
       this.updateCompany(payload);
     },
     updateCompany(payload) {
+      this.isButtonDisabled = true;
       const path = `https://localhost:7253/company`;
       axios.put(path, payload)
         .then((res) => {
           this.getCompanies();
           toast.success(res.data, { autoClose: 1000, });
+          this.isButtonDisabled = false;
         })
         .catch((error) => {
+          this.isButtonDisabled = false;
           toast.error("Erro ao atualizar empresa", { autoClose: 1000, });
           console.error(error);
           this.getCompanies();

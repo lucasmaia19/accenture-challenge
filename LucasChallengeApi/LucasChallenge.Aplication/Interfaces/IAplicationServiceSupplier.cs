@@ -16,5 +16,6 @@ namespace LucasChallenge.Aplication.Interfaces
 
         ICollection<SupplierDto> GetSupplier();
         SupplierDto GetSupplierById(long supplierId);
+        Task<bool> ValidateCepAsync(string cpf);
     }
 }
