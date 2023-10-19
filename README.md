@@ -20,8 +20,3 @@ Foi utilizado o sql server com migration para gerenciar as mudanças na estrutur
 ## Arquitetura
 
 - O sistema foi projetado de acordo com os princípios de DDD, com uma separação clara entre o domínio, a infraestrutura e a apresentação.
-
-## Observação
-
-- Por falta de tempo, não foi possível relacionar as entidades no banco de dados. No entanto, o código do back-end já está preparado para isso.
-- API de validação de cep foi usada a opencep.com pois a http://cep.la/api expirou.
